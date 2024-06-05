@@ -339,11 +339,13 @@ button.gis_logo_button {
 }
 
 .wealth_div__img {
+  display: block;
   flex-shrink: 0;
+  height: 100%;
   max-height: 64px;
+  width: auto;
 }
 
-/* Simulator */
 .gis_user_wrapper {
   display: flex;
   flex-direction: column;
@@ -357,6 +359,19 @@ button.gis_logo_button {
   font-size: 0.8em;
   opacity: 0.5;
 }
+
+.wealth_div.no-img .wealth_div__img {
+  display: none;
+}
+
+.wealth_div.no-img .gis_user_wrapper {
+  flex-direction: row;
+  align-items: baseline;
+  column-gap: 8px;
+  font-size: 14px;
+}
+
+/* distribution_div */
 
 .distribution_div {
   color: #fff;

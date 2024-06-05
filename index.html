@@ -2103,7 +2103,7 @@ void main(void) {
           [0, (current_pledge + pledger.last_income) / max_transferable, 1. / 3., pledger.last_income / max_transferable]
         ]
 
-        label_html.push("<div class='gis_user_wrapper'><div class='gis_user_name'>" + pledger.name + " Pledged</div>" + "Pledged $" + pledger.last_income + "</div>");
+        label_html.push("<div class='gis_user_wrapper'><div class='gis_user_name'>" + pledger.name + "</div>" + "Pledged $" + pledger.last_income + "</div>");
         label_positions.push([
           avg_x,
           current_pledge / max_transferable + avg_y,
@@ -2149,7 +2149,7 @@ void main(void) {
           [2. / 3., (current_receive + receiver.last_income) / max_transferable, 1. / 3., receiver.last_income / max_transferable],
           [1, (current_receive + receiver.last_income) / max_transferable, 1. / 3., receiver.last_income / max_transferable]
         ]
-        label_html.push("<div class='gis_user_wrapper'><div class='gis_user_name'>" + receiver.name + " Receives</div>" + "Receives $" + receiver.last_income + "</div>");
+        label_html.push("<div class='gis_user_wrapper'><div class='gis_user_name'>" + receiver.name + "</div>" + "Receives $" + receiver.last_income + "</div>");
         label_positions.push([
           avg_x,
           current_receive / max_transferable + avg_y,
@@ -2345,9 +2345,10 @@ void main(void) {
               "profiles/Face 10.png"
             ]
             const getFaceSrc = hash => faceSrcs[Math.abs(hash) % faceSrcs.length]
+            const hideImg = h < 60
 
             return acc + `
-              <div class='wealth_div'
+              <div class='wealth_div ${hideImg ? 'no-img' : ''}'
                 style='box-shadow: 4px 4px 0px ${boxShadowColor}; left: ${x}px; top: ${y}px; width: ${w}px; height: ${h}px;'>
                 <img class="wealth_div__img" src='${getFaceSrc(hash)}' />
                 <div class='wealth_div__label'>${label_html}</div>
