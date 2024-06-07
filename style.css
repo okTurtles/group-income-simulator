@@ -425,6 +425,7 @@ height: 100% !important;
   margin-right: 10px;
   font-weight: 700;
   transform: translateY(2px);
+  flex-shrink: 0;
 }
 
 .amount-input {
@@ -452,6 +453,60 @@ height: 100% !important;
 
 .gis_footer button.footer-btn {
   border-radius: 4px;
+}
+
+/* Footer in small screen */
+@media screen and (max-width: 540px) {
+  .gis_footer {
+    padding: 10px 12px;
+  }
+
+  .gis_footer_wrapper {
+    gap: 0;
+    overflow: hidden;
+    border-radius: 4px;
+    width: max-content;
+    max-width: unset;
+  }
+
+  .footer-input-wrapper {
+    min-height: 32px;
+    padding: 4px 8px;
+  }
+
+  .footer-input-wrapper .amount-label {
+    font-size: 10px;
+    margin-right: 4px;
+  }
+
+  .footer-input-wrapper .amount-input {
+    font-size: 12px;
+    padding: 4px 6px;
+    width: 68px;
+  }
+
+  .gis_footer button.footer-btn {
+    border-radius: 0px;
+    min-height: 32px;
+    padding-left: 8px;
+    padding-right: 8px;
+    font-size: 11px;
+    min-width: 100px;
+  }
+}
+
+@media screen and (max-width: 380px) {
+  .gis_footer {
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+
+  .gis_footer button.footer-btn {
+    font-size: 10px;
+    padding-left: 6px;
+    padding-right: 6px;
+    min-width: unset;
+  }
 }
 
  .gis_payment_wrapper {
@@ -488,14 +543,7 @@ height: 100% !important;
    color: #363636;
  }
 
- .gis_currency_input input {
-   border: 0;
-   width: 48px;
- }
-
-
- @media (orientation: landscape) {
-  .gis_footer_wrapper > * {
-    max-width: 25%;
-  }
+.gis_currency_input input {
+  border: 0;
+  width: 48px;
 }
