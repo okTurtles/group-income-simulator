@@ -6,6 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <link rel="icon" type="image/svg+xml" href="favicon.ico">
   <link rel="stylesheet" href="style.css">
+
+  <!-- 
+    Rest In Peace Ian, a.k.a CrazedCoding (https://github.com/CrazedCoding),
+    who was the original author of this project and a truly talented front-end engineer.
+  -->
 </head>
 
 <body>
@@ -17,6 +22,7 @@
       </div>
       <button class="gis_logo_button button" onclick="clear_all()">Reset</button>
     </header>
+
     <div id="gis_body" class="gis_main">
       <label id="gis_lock_message" class="distribution-locked-msg">Distribution Locked</Label>
 
@@ -39,17 +45,16 @@
         </div>
       </div>
     </div>
+
     <footer class="gis_footer">
       <div class="gis_footer_wrapper gis_wrapper">
-        <div class="gis_buttons" onclick="add_pledger()">Add Pledger</div>
-        <div class="gis_input_wrapper">
-          <div class="gis_input_field">
-            <label class="gis_input_label">Amount:</label>
-            <input id="amount" class="gis_amount" type="number" value="10" min="0" step="1" />
-          </div>
-          <label class="gis_currency">$ USD</label>
+        <button class="is-success footer-btn" onclick="add_pledger()">Add Pledger</button>
+        <div class="footer-input-wrapper">
+          <label class="amount-label">Amount ($) :</label>
+          <input id="amount" class="amount-input" type="number"
+            value="10" min="0" step="1" />
         </div>
-        <div class="gis_buttons" onclick="add_receiver()">Add Receiver</div>
+        <button class="is-warning footer-btn" onclick="add_receiver()">Add Receiver</button>
       </div>
     </footer>
   </div>
