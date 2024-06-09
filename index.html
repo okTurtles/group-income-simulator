@@ -38,6 +38,7 @@
         <br>
         Start adding members to see how it works.
       </p>
+
       <div id="gis_canvas_div">
         <div style="width:100%; height: 100%; position: absolute;" id="gis_label_div">
         </div>
@@ -473,18 +474,6 @@
     const OpenGLStageTypes = Format.OpenGLStage.Type;
 
     var is_safari = (navigator.userAgent.indexOf("iPhone") > -1 || navigator.userAgent.indexOf("iPad") > -1 || navigator.userAgent.indexOf("Safari") > -1) && navigator.userAgent.indexOf("Chrome") == -1;
-
-    window.requestAnimFrame = (function () {
-      return window.requestAnimationFrame ||
-        window.webkitRequestAnimationFrame ||
-        window.mozRequestAnimationFrame ||
-        window.oRequestAnimationFrame ||
-        window.msRequestAnimationFrame ||
-        function ( /* function FrameRequestCallback */ callback, /* DOMElement Element */ element) {
-          window.setTimeout(callback, 1000 / 60);
-        };
-    })();
-
     var api_names = ["webgl", "experimental-webgl", "webkit-3d", "moz-webgl"];
 
     var OpenGLPipeline = function (pipleline_proto) { // "Constructor."
@@ -1301,8 +1290,10 @@
           pipeline = new OpenGLPipeline(algorithm.pipeline);
       }
 
-      if (pipeline)
+      if (pipeline) {
+        // This is where window.requestAnimationFrame() is called, which infinitely repaints the page UI.
         pipeline.renderLoop();
+      }
     }
   </script>
 
@@ -1662,7 +1653,8 @@ void main(void) {
       receivers = []
       distribution_events = []
       var thread_safe_events = JSON.parse(JSON.stringify(event_list))
-      event_parse_loop: for (var j = 0; j < thread_safe_events.length; j++) {
+
+      for (var j = 0; j < thread_safe_events.length; j++) {
         var event = thread_safe_events[j];
 
         if (event.type == EVENT_TYPES.JOIN) {
@@ -1731,14 +1723,30 @@ void main(void) {
         }
       }
 
-      if (distribution_locked) {
-        document.getElementById("gis_lock_message").style.visibility = 'visible'
-      } else {
-        document.getElementById("gis_lock_message").style.visibility = 'hidden'
+      const lockMsgEl = document.getElementById('gis_lock_message')
+      const loadMsgEl = document.getElementById("load_message")
+
+      // Reveal or hide distribution-locked message.
+      if (lockMsgEl) {
+        lockMsgEl.style.visibility = distribution_locked ? 'visible' : 'hidden'
       }
 
-      if(pledgers.length + receivers.length > 0) document.getElementById("load_message").style.display = 'none';
-      else document.getElementById("load_message").style.display = 'block'
+      // Reveal or hide the load-message content.
+      if (loadMsgEl) {
+        loadMsgEl.style.display = pledgers.length + receivers.length > 0 ? 'none' : 'block'
+      }
+
+      // determine to increse the canvas height depending on the numbers of current pledgers / receivers.
+      const largeMemberCount = Math.max(pledgers.length, receivers.length)
+      const memberCountThreshold = window.matchMedia('(max-height: 900px)').matches ? 7 : 6
+      const needsTallerCanvas = largeMemberCount > memberCountThreshold
+
+      if (needsTallerCanvas) {
+        const canvasEl = document.getElementById("gis_canvas_div")
+        const extraNumber = largeMemberCount - memberCountThreshold
+        
+        console.log('TODO: Add a logic here to increase the canvas height')
+      }
     }
 
     function round_money(amount, digits = 2) {
@@ -1809,10 +1817,10 @@ void main(void) {
 
         label_html.push("<div class='gis_user_wrapper'><div class='gis_user_name'>" + pledger.name + "</div>" + "Pledged $" + pledger.last_income + "</div>");
         label_positions.push([
-          avg_x,
-          current_pledge / max_transferable + avg_y,
-          1. / 3.,
-          (pledger.last_income) / max_transferable
+          avg_x, // left-top x
+          current_pledge / max_transferable + avg_y, // left-top y
+          1. / 3., // width
+          (pledger.last_income) / max_transferable // height
         ])
 
         if (point_in_triangle(mouse_canvas_position, [trapezoid[0], trapezoid[1], trapezoid[2]]) ||
@@ -2050,9 +2058,10 @@ void main(void) {
             ]
             const getFaceSrc = hash => faceSrcs[Math.abs(hash) % faceSrcs.length]
             const hideImg = h < 60
+            const smallWidth = w < 180
 
             return acc + `
-              <div class='wealth_div ${hideImg ? 'no-img' : ''}'
+              <div class='wealth_div ${hideImg ? 'no-img' : ''} ${smallWidth ? 'small-width' : ''}'
                 style='box-shadow: 4px 4px 0px ${boxShadowColor}; left: ${x}px; top: ${y}px; width: ${w}px; height: ${h}px;'>
                 <img class="wealth_div__img" src='${getFaceSrc(hash)}' />
                 <div class='wealth_div__label'>${label_html}</div>
