@@ -115,46 +115,6 @@
     var validatorError = (typeFn, value, scope, message, expectedType, valueType) => {
       return new TypeValidatorError(message, expectedType || getType2(typeFn), valueType || typeof value, JSON.stringify(value), typeFn.name, scope);
     };
-    var arrayOf = (typeFn, _scope = "Array") => {
-      function array(value) {
-        if (isEmpty(value))
-          return [typeFn(value)];
-        if (Array.isArray(value)) {
-          let index2 = 0;
-          return value.map((v) => typeFn(v, `${_scope}[${index2++}]`));
-        }
-        throw validatorError(array, value, _scope);
-      }
-      array.type = () => `Array<${getType2(typeFn)}>`;
-      return array;
-    };
-    var literalOf = (primitive) => {
-      function literal(value, _scope = "") {
-        if (isEmpty(value) || value === primitive)
-          return primitive;
-        throw validatorError(literal, value, _scope);
-      }
-      literal.type = () => {
-        if (isBoolean2(primitive))
-          return `${primitive ? "true" : "false"}`;
-        else
-          return `"${primitive}"`;
-      };
-      return literal;
-    };
-    var mapOf = (keyTypeFn, typeFn) => {
-      function mapOf2(value) {
-        if (isEmpty(value))
-          return {};
-        const o = object(value);
-        const reducer = (acc, key) => Object.assign(acc, {
-          [keyTypeFn(key, "Map[_]")]: typeFn(o[key], `Map.${key}`)
-        });
-        return Object.keys(o).reduce(reducer, {});
-      }
-      mapOf2.type = () => `{ [_:${getType2(keyTypeFn)}]: ${getType2(typeFn)} }`;
-      return mapOf2;
-    };
     var object = function (value) {
       if (isEmpty(value))
         return {};
@@ -163,74 +123,7 @@
       }
       throw validatorError(object, value);
     };
-    var objectOf = (typeObj, _scope = "Object") => {
-      function object2(value) {
-        const o = object(value);
-        const typeAttrs = Object.keys(typeObj);
-        const unknownAttr = Object.keys(o).find((attr) => !typeAttrs.includes(attr));
-        if (unknownAttr) {
-          throw validatorError(object2, value, _scope, `missing object property '${unknownAttr}' in ${_scope} type`);
-        }
-        const undefAttr = typeAttrs.find((property) => {
-          const propertyTypeFn = typeObj[property];
-          return propertyTypeFn.name.includes("maybe") && !o.hasOwnProperty(property);
-        });
-        if (undefAttr) {
-          throw validatorError(object2, o[undefAttr], `${_scope}.${undefAttr}`, `empty object property '${undefAttr}' for ${_scope} type`, `void | null | ${getType2(typeObj[undefAttr]).substr(1)}`, "-");
-        }
-        const reducer = isEmpty(value) ? (acc, key) => Object.assign(acc, {
-          [key]: typeObj[key](value)
-        }) : (acc, key) => {
-          const typeFn = typeObj[key];
-          if (typeFn.name.includes("optional") && !o.hasOwnProperty(key)) {
-            return Object.assign(acc, {});
-          } else {
-            return Object.assign(acc, {
-              [key]: typeFn(o[key], `${_scope}.${key}`)
-            });
-          }
-        };
-        return typeAttrs.reduce(reducer, {});
-      }
-      object2.type = () => {
-        const props2 = Object.keys(typeObj).map((key) => {
-          const ret = typeObj[key].name.includes("optional") ? `${key}?: ${getType2(typeObj[key], { noVoid: true })}` : `${key}: ${getType2(typeObj[key])}`;
-          return ret;
-        });
-        return `{|
-     ${props2.join(",\n  ")} 
-    |}`;
-      };
-      return object2;
-    };
 
-    function objectMaybeOf(validations, _scope = "Object") {
-      return function (data) {
-        object(data);
-        for (const key in data) {
-          validations[key]?.(data[key], `${_scope}.${key}`);
-        }
-        return data;
-      };
-    }
-    var optional = (typeFn) => {
-      const unionFn = unionOf(typeFn, undef);
-
-      function optional2(v) {
-        return unionFn(v);
-      }
-      optional2.type = ({
-        noVoid
-      }) => !noVoid ? getType2(unionFn) : getType2(typeFn);
-      return optional2;
-    };
-
-    function undef(value, _scope = "") {
-      if (isEmpty(value) || isUndef2(value))
-        return void 0;
-      throw validatorError(undef, value, _scope);
-    }
-    undef.type = () => "void";
     var boolean = function boolean2(value, _scope = "") {
       if (isEmpty(value))
         return false;
@@ -252,143 +145,6 @@
         return value;
       throw validatorError(string2, value, _scope);
     };
-
-    function tupleOf_(...typeFuncs) {
-      function tuple(value, _scope = "") {
-        const cardinality = typeFuncs.length;
-        if (isEmpty(value))
-          return typeFuncs.map((fn) => fn(value));
-        if (Array.isArray(value) && value.length === cardinality) {
-          const tupleValue = [];
-          for (let i = 0; i < cardinality; i += 1) {
-            tupleValue.push(typeFuncs[i](value[i], _scope));
-          }
-          return tupleValue;
-        }
-        throw validatorError(tuple, value, _scope);
-      }
-      tuple.type = () => `[${typeFuncs.map((fn) => getType2(fn)).join(", ")}]`;
-      return tuple;
-    }
-    var tupleOf = tupleOf_;
-
-    function unionOf_(...typeFuncs) {
-      function union(value, _scope = "") {
-        for (const typeFn of typeFuncs) {
-          try {
-            return typeFn(value, _scope);
-          } catch (_) { }
-        }
-        throw validatorError(union, value, _scope);
-      }
-      union.type = () => `(${typeFuncs.map((fn) => getType2(fn)).join(" | ")})`;
-      return union;
-    }
-    var unionOf = unionOf_;
-
-    // frontend/model/contracts/shared/constants.js
-    var INVITE_INITIAL_CREATOR = "invite-initial-creator";
-    var INVITE_STATUS = {
-      REVOKED: "revoked",
-      VALID: "valid",
-      USED: "used"
-    };
-    var PROFILE_STATUS = {
-      ACTIVE: "active",
-      PENDING: "pending",
-      REMOVED: "removed"
-    };
-    var PROPOSAL_RESULT = "proposal-result";
-    var PROPOSAL_INVITE_MEMBER = "invite-member";
-    var PROPOSAL_REMOVE_MEMBER = "remove-member";
-    var PROPOSAL_GROUP_SETTING_CHANGE = "group-setting-change";
-    var PROPOSAL_PROPOSAL_SETTING_CHANGE = "proposal-setting-change";
-    var PROPOSAL_GENERIC = "generic";
-    var PROPOSAL_ARCHIVED = "proposal-archived";
-    var MAX_ARCHIVED_PROPOSALS = 100;
-    var PAYMENTS_ARCHIVED = "payments-archived";
-    var MAX_ARCHIVED_PERIODS = 100;
-    var MAX_SAVED_PERIODS = 2;
-    var STATUS_OPEN = "open";
-    var STATUS_PASSED = "passed";
-    var STATUS_FAILED = "failed";
-    var STATUS_CANCELLED = "cancelled";
-    var CHATROOM_TYPES = {
-      INDIVIDUAL: "individual",
-      GROUP: "group"
-    };
-    var CHATROOM_PRIVACY_LEVEL = {
-      GROUP: "chatroom-privacy-level-group",
-      PRIVATE: "chatroom-privacy-level-private",
-      PUBLIC: "chatroom-privacy-level-public"
-    };
-    var MESSAGE_TYPES = {
-      POLL: "message-poll",
-      TEXT: "message-text",
-      INTERACTIVE: "message-interactive",
-      NOTIFICATION: "message-notification"
-    };
-    var INVITE_EXPIRES_IN_DAYS = {
-      ON_BOARDING: 30,
-      PROPOSAL: 7
-    };
-    var MESSAGE_NOTIFICATIONS = {
-      ADD_MEMBER: "add-member",
-      JOIN_MEMBER: "join-member",
-      LEAVE_MEMBER: "leave-member",
-      KICK_MEMBER: "kick-member",
-      UPDATE_DESCRIPTION: "update-description",
-      UPDATE_NAME: "update-name",
-      DELETE_CHANNEL: "delete-channel",
-      VOTE: "vote"
-    };
-    var PROPOSAL_VARIANTS = {
-      CREATED: "proposal-created",
-      EXPIRING: "proposal-expiring",
-      ACCEPTED: "proposal-accepted",
-      REJECTED: "proposal-rejected",
-      EXPIRED: "proposal-expired"
-    };
-    var MAIL_TYPE_MESSAGE = "message";
-    var MAIL_TYPE_FRIEND_REQ = "friend-request";
-    // frontend/model/contracts/shared/payments/index.js
-    var PAYMENT_PENDING = "pending";
-    var PAYMENT_CANCELLED = "cancelled";
-    var PAYMENT_ERROR = "error";
-    var PAYMENT_NOT_RECEIVED = "not-received";
-    var PAYMENT_COMPLETED = "completed";
-    var paymentStatusType = unionOf(...[PAYMENT_PENDING, PAYMENT_CANCELLED, PAYMENT_ERROR, PAYMENT_NOT_RECEIVED, PAYMENT_COMPLETED].map((k) => literalOf(k)));
-    var PAYMENT_TYPE_MANUAL = "manual";
-    var PAYMENT_TYPE_BITCOIN = "bitcoin";
-    var PAYMENT_TYPE_PAYPAL = "paypal";
-    var paymentType = unionOf(...[PAYMENT_TYPE_MANUAL, PAYMENT_TYPE_BITCOIN, PAYMENT_TYPE_PAYPAL].map((k) => literalOf(k)));
-
-    // frontend/model/contracts/shared/functions.js
-    function paymentHashesFromPaymentPeriod(periodPayments) {
-      let hashes = [];
-      if (periodPayments) {
-        const {
-          paymentsFrom
-        } = periodPayments;
-        for (const fromUser in paymentsFrom) {
-          for (const toUser in paymentsFrom[fromUser]) {
-            hashes = hashes.concat(paymentsFrom[fromUser][toUser]);
-          }
-        }
-      }
-      return hashes;
-    }
-
-    function createPaymentInfo(paymentHash, payment) {
-      return {
-        from: payment.meta.username,
-        to: payment.data.toUser,
-        hash: paymentHash,
-        amount: payment.data.amount,
-        isLate: !!payment.data.isLate,
-        when: payment.data.completedDate
-      };
-    }
 
     // frontend/model/contracts/shared/distribution/mincome-proportional.js
     function mincomeProportional(haveNeeds) {
@@ -480,69 +236,9 @@
     // frontend/model/contracts/shared/currencies.js
     var DECIMALS_MAX = 8;
 
-    function commaToDots(value) {
-      return typeof value === "string" ? value.replace(/,/, ".") : value.toString();
-    }
-
-    function isNumeric(nr) {
-      return !isNaN(nr - parseFloat(nr));
-    }
-
-    function isInDecimalsLimit(nr, decimalsMax) {
-      const decimals = nr.split(".")[1];
-      return !decimals || decimals.length <= decimalsMax;
-    }
-
-    function validateMincome(value, decimalsMax) {
-      const nr = commaToDots(value);
-      return isNumeric(nr) && isInDecimalsLimit(nr, decimalsMax);
-    }
-
-    function decimalsOrInt(num, decimalsMax) {
-      return num.toFixed(decimalsMax).replace(/\.0+$/, "");
-    }
-
     function saferFloat(value) {
       return parseFloat(value.toFixed(DECIMALS_MAX));
     }
-
-    function makeCurrency(options) {
-      const {
-        symbol,
-        symbolWithCode,
-        decimalsMax,
-        formatCurrency
-      } = options;
-      return {
-        symbol,
-        symbolWithCode,
-        decimalsMax,
-        displayWithCurrency: (n) => formatCurrency(decimalsOrInt(n, decimalsMax)),
-        displayWithoutCurrency: (n) => decimalsOrInt(n, decimalsMax),
-        validate: (n) => validateMincome(n, decimalsMax)
-      };
-    }
-    var currencies = {
-      USD: makeCurrency({
-        symbol: "$",
-        symbolWithCode: "$ USD",
-        decimalsMax: 2,
-        formatCurrency: (amount) => "$" + amount
-      }),
-      EUR: makeCurrency({
-        symbol: "\u20AC",
-        symbolWithCode: "\u20AC EUR",
-        decimalsMax: 2,
-        formatCurrency: (amount) => "\u20AC" + amount
-      }),
-      BTC: makeCurrency({
-        symbol: "\u0243",
-        symbolWithCode: "\u0243 BTC",
-        decimalsMax: DECIMALS_MAX,
-        formatCurrency: (amount) => amount + "\u0243"
-      })
-    };
-    var currencies_default = currencies;
 
     // frontend/model/contracts/shared/distribution/distribution.js
     var tinyNum = 1 / Math.pow(10, DECIMALS_MAX);
@@ -609,6 +305,7 @@
       return addDistributions(paymentsA, paymentsB);
     }
   </script>
+
   <script type="text/javascript">
     function getFormat() {
       function File() { }
@@ -739,6 +436,7 @@
     }
     const Format = getFormat()
   </script>
+
   <script type="text/javascript">
     var default_fragment_shader =
       `
@@ -1607,6 +1305,7 @@
         pipeline.renderLoop();
     }
   </script>
+
   <script type="text/javascript">
     let body = document.getElementById("gis_body")
     String.prototype.hashCode = function () {
