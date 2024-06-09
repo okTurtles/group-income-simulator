@@ -41,41 +41,29 @@ $desktop: 1200px;
 }
 
 /* Fonts */
- @font-face {
-   src: url(./fonts/Poppins/Poppins-Medium.ttf);
-   font-family: "Poppins";
-   font-weight: 500;
- }
+@font-face {
+  src: url(./fonts/Poppins/Poppins-Regular.ttf);
+  font-family: "Poppins";
+  font-weight: 400;
+}
 
- @font-face {
-   src: url(./fonts/Poppins/Poppins-SemiBold.ttf);
-   font-family: "Poppins";
-   font-weight: 600;
- }
+@font-face {
+  src: url(./fonts/Poppins/Poppins-Medium.ttf);
+  font-family: "Poppins";
+  font-weight: 500;
+}
 
- @font-face {
-   src: url(./fonts/Poppins/Poppins-Bold.ttf);
-   font-family: "Poppins";
-   font-weight: 700;
- }
+@font-face {
+  src: url(./fonts/Poppins/Poppins-SemiBold.ttf);
+  font-family: "Poppins";
+  font-weight: 600;
+}
 
- @font-face {
-   src: url(./fonts/Poppins/Poppins-Regular.ttf);
-   font-family: "Poppins";
-   font-weight: 400;
- }
-
- @font-face {
-   src: url(./fonts/Lato/Lato-Bold.ttf);
-   font-family: "Lato";
-   font-weight: 700;
- }
-
- @font-face {
-   src: url(./fonts/Lato/Lato-Regular.ttf);
-   font-family: "Lato";
-   font-weight: 400;
- }
+@font-face {
+  src: url(./fonts/Poppins/Poppins-Bold.ttf);
+  font-family: "Poppins";
+  font-weight: 700;
+}
 
 /* Buttons */
 
@@ -237,7 +225,7 @@ button.gis_logo_button {
   line-height: 1;
   top: 6px;
   text-transform: uppercase;
-  color: #363636;
+  color: var(--text_0);
   vertical-align: middle;
   user-select: none;
   margin: -8px 0 0 0;
@@ -532,7 +520,6 @@ height: 100% !important;
 
  .gis_payment_input,
  .gis_currency_input {
-   font-family: 'Lato';
    font-style: normal;
    font-weight: 400;
    font-size: 12px;
@@ -541,7 +528,7 @@ height: 100% !important;
 
    letter-spacing: -0.3px;
 
-   color: #363636;
+   color: var(--text_0);
  }
 
 .gis_currency_input input {
