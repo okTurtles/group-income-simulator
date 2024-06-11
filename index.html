@@ -1552,12 +1552,22 @@ void main(void) {
       event_list = []
       user_counter = 1;
 
-      const canvasEl = document.getElementById("gis_canvas_div")
+      pledger_clicked = null;
+      payment_clicked = null;
+      receiver_clicked = null;
+
+      const canvasEl = document.getElementById('gis_canvas_div')
+      const optionsEl = document.getElementById('gis_options_div')
 
       if (canvasEl) {
         // clear the inline styles on the canvas container element
         canvasEl.style.minHeight = null
         canvasEl.style.maxHeight = null
+      }
+
+      if (optionsEl) {
+        optionsEl.style.display = 'none'
+        optionsEl.innerHTML = ''
       }
     }
 
@@ -1839,6 +1849,7 @@ void main(void) {
           mouse_under = true;
           pledger_clicked = function (pledger) {
             return function () {
+              console.log('!@# is it called - aaaaa')
               var change_pledge = `
               <label style="display:inline-block;">Amount:</label>
             <input id="pledge_amount" type="number" value="` + pledger.last_income + `" step="1" style="display:inline-block; width:64px">`
@@ -1998,6 +2009,12 @@ void main(void) {
 
       function res() {
         pipeline.contexts[pipeline.contexts.length - 1].resizeCanvas()
+
+        const optionsEl = document.getElementById('gis_options_div')
+        if (optionsEl) {
+          optionsEl.style.display = 'none'
+          optionsEl.innerHTML = ''
+        }
       }
       window.addEventListener('resize', res);
 
