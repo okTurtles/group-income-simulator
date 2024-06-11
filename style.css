@@ -337,6 +337,12 @@ button.gis_logo_button {
   width: auto;
 }
 
+@media screen and (max-width: 670px) {
+  .wealth_div__img {
+    display: none;
+  }
+}
+
 .gis_user_wrapper {
   display: flex;
   flex-direction: column;
@@ -346,46 +352,38 @@ button.gis_logo_button {
   line-height: 1.3;
 }
 
+@media screen and (max-width: 769px) {
+  .gis_user_wrapper {
+    font-size: 14px;
+  }
+}
+
+@media screen and (max-width: 441px) {
+  .gis_user_wrapper {
+    font-size: 12px;
+  }
+}
+
 .gis_user_name {
-  font-size: 0.8em;
+  font-size: 0.825em;
   opacity: 0.5;
 }
 
-.wealth_div.no-img {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
+/* no-img style of label UI */
+@media screen and (max-width: 580px) {
+  .wealth_div.small-width {
+    padding: 8px 6px;
+  }
 }
 
-.wealth_div.no-img .wealth_div__label {
-  flex-grow: unset;
-}
-
-.wealth_div.no-img .wealth_div__img {
-  display: none;
-}
-
-.wealth_div.no-img .gis_user_wrapper {
-  flex-direction: row;
-  align-items: baseline;
-  column-gap: 8px;
-  row-gap: 4px;
-  font-size: 14px;
-}
-
-.wealth_div.no-img.small-width .gis_user_wrapper {
-  flex-direction: column;
-}
 
 /* distribution_div */
 
 .distribution_div {
-  color: #fff;
+  color: var(--background_0);
   background: var(--text_0);
-  border: 1px solid var(--background_0);
   z-index: 10;
-  padding: 3px !important;
+  padding: 4px !important;
   border-radius: 6px;
   position: absolute;
   text-align: left;

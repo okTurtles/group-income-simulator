@@ -1551,6 +1551,14 @@ void main(void) {
       receivers = []
       event_list = []
       user_counter = 1;
+
+      const canvasEl = document.getElementById("gis_canvas_div")
+
+      if (canvasEl) {
+        // clear the inline styles on the canvas container element
+        canvasEl.style.minHeight = null
+        canvasEl.style.maxHeight = null
+      }
     }
 
     var mouse_page_position = [0, 0]
@@ -1739,13 +1747,16 @@ void main(void) {
       // determine to increse the canvas height depending on the numbers of current pledgers / receivers.
       const largeMemberCount = Math.max(pledgers.length, receivers.length)
       const memberCountThreshold = window.matchMedia('(max-height: 900px)').matches ? 7 : 6
+      const extraHeightUnit = window.matchMedia('(max-height: 900px)').matches ? 150 : 70
       const needsTallerCanvas = largeMemberCount > memberCountThreshold
 
       if (needsTallerCanvas) {
         const canvasEl = document.getElementById("gis_canvas_div")
         const extraNumber = largeMemberCount - memberCountThreshold
-        
-        console.log('TODO: Add a logic here to increase the canvas height')
+        const containerHeight = document.querySelector('#gis_body')?.getBoundingClientRect().height || 0
+
+        canvasEl.style.minHeight = `${containerHeight + extraHeightUnit * extraNumber}px`
+        canvasEl.style.maxHeight = 'unset'
       }
     }
 
@@ -2021,11 +2032,12 @@ void main(void) {
       }
       window.show_labels = () => {
         if (label_html) {
+          const LABEL_MAX_HEIGHT = window.innerWidth > 760 ? 86 : 70
           var html = label_html.reduce((acc, label_html, index) => {
             var x = Math.floor(label_positions[index][0] * canvas_div.offsetWidth)
             var y = Math.floor((1. - label_positions[index][1]) * canvas_div.offsetHeight)
             var w = Math.floor(label_positions[index][2] * canvas_div.offsetWidth)
-            var h = Math.floor((label_positions[index][3]) * canvas_div.offsetHeight)
+            var h = Math.min(Math.floor((label_positions[index][3]) * canvas_div.offsetHeight), LABEL_MAX_HEIGHT)
 
             var is_receiver = index >= pledgers.length
             var user = is_receiver ? receivers[index - pledgers.length] : pledgers[index];
@@ -2057,11 +2069,10 @@ void main(void) {
               "profiles/Face 10.png"
             ]
             const getFaceSrc = hash => faceSrcs[Math.abs(hash) % faceSrcs.length]
-            const hideImg = h < 60
             const smallWidth = w < 180
 
             return acc + `
-              <div class='wealth_div ${hideImg ? 'no-img' : ''} ${smallWidth ? 'small-width' : ''}'
+              <div class='wealth_div ${smallWidth ? 'small-width' : ''}'
                 style='box-shadow: 4px 4px 0px ${boxShadowColor}; left: ${x}px; top: ${y}px; width: ${w}px; height: ${h}px;'>
                 <img class="wealth_div__img" src='${getFaceSrc(hash)}' />
                 <div class='wealth_div__label'>${label_html}</div>
@@ -2072,7 +2083,7 @@ void main(void) {
           html += total_html.reduce((acc, html, index) => {
             var x = Math.floor(total_positions[index][0] * canvas_div.offsetWidth)
             var y = Math.floor((1. - total_positions[index][1]) * canvas_div.offsetHeight)
-            return acc + '<div class="distribution_div" style="transform:translate(-50%,-50%); position:absolute; display:block; left: ' + x + 'px; top: ' + y + 'px; z-index:10;">' + html + '</div>'
+            return acc + '<div class="distribution_div" style="transform:translate(0%,-50%); position:absolute; display:block; left: ' + x + 'px; top: ' + y + 'px; z-index:10;">' + html + '</div>'
           }, "")
 
           label_div.style.display = "block"
