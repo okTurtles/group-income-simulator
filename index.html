@@ -2098,8 +2098,10 @@ void main(void) {
       }
 
       function onmousemove(e) {
-        mouse_page_position = [e.pageX, e.pageY]
-        mouse_canvas_position = [(e.pageX - canvas_div.offsetLeft) / canvas_div.offsetWidth, 1. - (e.pageY - canvas_div.offsetTop) / canvas_div.offsetHeight]
+        const contentScrollY = document.querySelector('#gis_body')?.scrollTop || 0
+
+        mouse_page_position = [e.pageX, contentScrollY + e.pageY]
+        mouse_canvas_position = [(e.pageX - canvas_div.offsetLeft) / canvas_div.offsetWidth, 1. - (contentScrollY + e.pageY - canvas_div.offsetTop) / canvas_div.offsetHeight]
       };
       canvas_div.onmousemove = onmousemove
       window.hide_option()
