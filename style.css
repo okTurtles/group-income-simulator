@@ -38,6 +38,9 @@ $desktop: 1200px;
   --orange: #F89202;
   --blue: #5DC9F1;
   --green: #A1D10E;
+
+  /* z-indexes */
+  --zindex-tooltip: 10;
 }
 
 /* Fonts */
@@ -264,15 +267,13 @@ button.gis_logo_button {
   padding: 8px;
   position: absolute;
   text-align: left;
-  z-index: 10;
+  z-index: var(--zindex-tooltip);
 }
 
 .gis_options_title {
-  font-family: 'Poppins';
-  font-style: normal;
-  font-weight: 600;
-  font-size: 14px;
+  font-size: 12px;
   line-height: 14px;
+  font-weight: 700;
   text-transform: uppercase;
   color: var(--text-0);
 }
@@ -514,40 +515,45 @@ button.gis_logo_button {
   }
 }
 
- .gis_payment_wrapper {
-   background: var(--background_0);
-   border: 1px solid var(--general_0);
-   border-radius: 4px;
- }
+.gis_payment_wrapper {
+  display: flex;
+  gap: 6px;
+  background: var(--background_0);
+}
 
- .gis_payment_button,
- .gis_leave_button {
-   background: #0288D1;
-   border-radius: 0px 4px 4px 0px;
-   font-family: 'Poppins';
-   font-style: normal;
-   font-weight: 400;
-   font-size: 14px;
-   line-height: 21px;
-   letter-spacing: 0.1px;
-   color: #FFFFFF;
-   border: none;
- }
+.gis_payment_button,
+.gis_leave_button {
+  min-height: unset;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+}
 
- .gis_payment_input,
- .gis_currency_input {
-   font-style: normal;
-   font-weight: 400;
-   font-size: 12px;
-   line-height: 24px;
-   /* identical to box height, or 200% */
+.gis_payment_input,
+.gis_currency_input {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 24px;
+  /* identical to box height, or 200% */
 
-   letter-spacing: -0.3px;
+  letter-spacing: -0.3px;
 
-   color: var(--text_0);
- }
+  color: var(--text_0);
+}
+
+.gis_payment_wrapper .gis_currency_input {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  border-radius: 4px;
+  border: 1px solid var(--general_0);
+}
 
 .gis_currency_input input {
   border: 0;
-  width: 48px;
+  width: 64px;
 }

@@ -1833,7 +1833,7 @@ void main(void) {
             <input id="pledge_amount" type="number" value="` + pledger.last_income + `" step="1" style="display:inline-block; width:64px">`
 
               show_option("<label class='gis_options_title'>" + pledger.name + "</label>" +
-                "<br><button class='gis_leave_button' onclick=\"user_leave_event(\'" + pledger.name + "\')\">Make Leave</button>");
+                "<br><button class='gis_leave_button' onclick=\"user_leave_event(\'" + pledger.name + "\')\">Leave</button>");
             }
           }(pledger)
         }
@@ -1879,7 +1879,7 @@ void main(void) {
             <input id="receive_amount" type="number" value="` + receiver.last_income + `" step="1" style="display:inline-block; width:64px">`
 
               show_option("<label class='gis_options_title'>" + receiver.name + "</label>" +
-                "<br><button class='gis_leave_button' onclick=\"user_leave_event(\'" + receiver.name + "\')\">Make Leave</button>");
+                "<br><button class='gis_leave_button' onclick=\"user_leave_event(\'" + receiver.name + "\')\">Leave</button>");
             }
           }(receiver)
         }
@@ -1941,7 +1941,7 @@ void main(void) {
           var make_payment = `<div class="gis_payment_wrapper"> <span class="gis_currency_input">$
 									<input id="payment_amount` + i + `" type="number" value="` + payment.amount + `" max="` + payment.amount + `"step="1" class="gis_payment_input"></span>`
           payment_message += (payment_message ? "<br>" : "") + "<label class='gis_options_title'>Send Payment</label><br>" + make_payment +
-            "<button class='gis_payment_button' onclick=\"document.getElementById('gis_options_div').style.display='hidden'; hide_option(); user_pay_event(\'" + payment.from + "\', \'" + payment.to + "\', parseFloat(document.getElementById('payment_amount" + i + "').value))\">Send Payment</button></div>"
+            "<button class='gis_payment_button' onclick=\"document.getElementById('gis_options_div').style.display='hidden'; hide_option(); user_pay_event(\'" + payment.from + "\', \'" + payment.to + "\', parseFloat(document.getElementById('payment_amount" + i + "').value))\">Send</button></div>"
 
           payment_clicked = function () {
             show_option(payment_message);
