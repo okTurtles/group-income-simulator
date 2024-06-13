@@ -261,6 +261,7 @@ button.gis_logo_button {
   visibility: hidden;
   height: 1em;
   color: var(--orange);
+  padding: 12px 0;
 }
  .gis_instruction {
    max-width: 100%;
