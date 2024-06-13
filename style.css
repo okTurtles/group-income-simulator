@@ -167,6 +167,7 @@ html {
   position: relative;
   margin: 0px auto;
   height: 100px;
+  width: 100%;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -207,7 +208,7 @@ button.gis_logo_button {
 
 @media screen and (max-width: 769px) {
   .gis_header_wrapper {
-    padding: 16px 0 0;
+    padding: 16px 16px 0;
     height: 70px;
   }
 
