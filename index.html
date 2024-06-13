@@ -6,20 +6,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <link rel="icon" type="image/svg+xml" href="favicon.ico">
   <link rel="stylesheet" href="style.css">
+
+  <!-- 
+    Rest In Peace Ian, a.k.a CrazedCoding (https://github.com/CrazedCoding),
+    who was the original author of this project and a truly talented front-end engineer.
+  -->
 </head>
 
 <body>
   <div class="gis_layout">
-    <header class="gis_wrapper gis_header_wrapper">
+    <header class="gis_header_wrapper">
       <div class="gis_logo">
         <img src="./images/logo.svg">
         <h1 class="gis_logo_label">Simulator</h1>
       </div>
       <button class="gis_logo_button button" onclick="clear_all()">Reset</button>
     </header>
-    <div id="gis_body" class="gis_main gis_wrapper gis_banners">
-      <label id="gis_lock_message" style="visibility:hidden; height:1em; border:none; color: #f70">Distribution
-        Locked</Label>
+
+    <div id="gis_body" class="gis_main">
+      <label id="gis_lock_message" class="distribution-locked-msg">Distribution Locked</Label>
+
       <p class="gis_instruction" id="load_message">
         Group income makes it easy for small communities to voluntarily provide a financial safety net for their
         members.
@@ -32,24 +38,24 @@
         <br>
         Start adding members to see how it works.
       </p>
+
       <div id="gis_canvas_div">
         <div style="width:100%; height: 100%; position: absolute;" id="gis_label_div">
         </div>
-        <div id="gis_options_div">
+        <div id="gis_options_div" class="options_div">
         </div>
       </div>
     </div>
+
     <footer class="gis_footer">
       <div class="gis_footer_wrapper gis_wrapper">
-        <div class="gis_buttons" onclick="add_pledger()">Add Pledger</div>
-        <div class="gis_input_wrapper">
-          <div class="gis_input_field">
-            <label class="gis_input_label">Amount:</label>
-            <input id="amount" class="gis_amount" type="number" value="10" min="0" step="1" />
-          </div>
-          <label class="gis_currency">$ USD</label>
+        <button class="footer-btn" onclick="add_pledger()">Add Pledger</button>
+        <div class="footer-input-wrapper">
+          <label class="amount-label">Amount ($) :</label>
+          <input id="amount" class="amount-input" type="number"
+            value="10" min="0" step="1" />
         </div>
-        <div class="gis_buttons" onclick="add_receiver()">Add Receiver</div>
+        <button class="footer-btn" onclick="add_receiver()">Add Receiver</button>
       </div>
     </footer>
   </div>
@@ -110,46 +116,6 @@
     var validatorError = (typeFn, value, scope, message, expectedType, valueType) => {
       return new TypeValidatorError(message, expectedType || getType2(typeFn), valueType || typeof value, JSON.stringify(value), typeFn.name, scope);
     };
-    var arrayOf = (typeFn, _scope = "Array") => {
-      function array(value) {
-        if (isEmpty(value))
-          return [typeFn(value)];
-        if (Array.isArray(value)) {
-          let index2 = 0;
-          return value.map((v) => typeFn(v, `${_scope}[${index2++}]`));
-        }
-        throw validatorError(array, value, _scope);
-      }
-      array.type = () => `Array<${getType2(typeFn)}>`;
-      return array;
-    };
-    var literalOf = (primitive) => {
-      function literal(value, _scope = "") {
-        if (isEmpty(value) || value === primitive)
-          return primitive;
-        throw validatorError(literal, value, _scope);
-      }
-      literal.type = () => {
-        if (isBoolean2(primitive))
-          return `${primitive ? "true" : "false"}`;
-        else
-          return `"${primitive}"`;
-      };
-      return literal;
-    };
-    var mapOf = (keyTypeFn, typeFn) => {
-      function mapOf2(value) {
-        if (isEmpty(value))
-          return {};
-        const o = object(value);
-        const reducer = (acc, key) => Object.assign(acc, {
-          [keyTypeFn(key, "Map[_]")]: typeFn(o[key], `Map.${key}`)
-        });
-        return Object.keys(o).reduce(reducer, {});
-      }
-      mapOf2.type = () => `{ [_:${getType2(keyTypeFn)}]: ${getType2(typeFn)} }`;
-      return mapOf2;
-    };
     var object = function (value) {
       if (isEmpty(value))
         return {};
@@ -158,74 +124,7 @@
       }
       throw validatorError(object, value);
     };
-    var objectOf = (typeObj, _scope = "Object") => {
-      function object2(value) {
-        const o = object(value);
-        const typeAttrs = Object.keys(typeObj);
-        const unknownAttr = Object.keys(o).find((attr) => !typeAttrs.includes(attr));
-        if (unknownAttr) {
-          throw validatorError(object2, value, _scope, `missing object property '${unknownAttr}' in ${_scope} type`);
-        }
-        const undefAttr = typeAttrs.find((property) => {
-          const propertyTypeFn = typeObj[property];
-          return propertyTypeFn.name.includes("maybe") && !o.hasOwnProperty(property);
-        });
-        if (undefAttr) {
-          throw validatorError(object2, o[undefAttr], `${_scope}.${undefAttr}`, `empty object property '${undefAttr}' for ${_scope} type`, `void | null | ${getType2(typeObj[undefAttr]).substr(1)}`, "-");
-        }
-        const reducer = isEmpty(value) ? (acc, key) => Object.assign(acc, {
-          [key]: typeObj[key](value)
-        }) : (acc, key) => {
-          const typeFn = typeObj[key];
-          if (typeFn.name.includes("optional") && !o.hasOwnProperty(key)) {
-            return Object.assign(acc, {});
-          } else {
-            return Object.assign(acc, {
-              [key]: typeFn(o[key], `${_scope}.${key}`)
-            });
-          }
-        };
-        return typeAttrs.reduce(reducer, {});
-      }
-      object2.type = () => {
-        const props2 = Object.keys(typeObj).map((key) => {
-          const ret = typeObj[key].name.includes("optional") ? `${key}?: ${getType2(typeObj[key], { noVoid: true })}` : `${key}: ${getType2(typeObj[key])}`;
-          return ret;
-        });
-        return `{|
-     ${props2.join(",\n  ")} 
-    |}`;
-      };
-      return object2;
-    };
 
-    function objectMaybeOf(validations, _scope = "Object") {
-      return function (data) {
-        object(data);
-        for (const key in data) {
-          validations[key]?.(data[key], `${_scope}.${key}`);
-        }
-        return data;
-      };
-    }
-    var optional = (typeFn) => {
-      const unionFn = unionOf(typeFn, undef);
-
-      function optional2(v) {
-        return unionFn(v);
-      }
-      optional2.type = ({
-        noVoid
-      }) => !noVoid ? getType2(unionFn) : getType2(typeFn);
-      return optional2;
-    };
-
-    function undef(value, _scope = "") {
-      if (isEmpty(value) || isUndef2(value))
-        return void 0;
-      throw validatorError(undef, value, _scope);
-    }
-    undef.type = () => "void";
     var boolean = function boolean2(value, _scope = "") {
       if (isEmpty(value))
         return false;
@@ -247,143 +146,6 @@
         return value;
       throw validatorError(string2, value, _scope);
     };
-
-    function tupleOf_(...typeFuncs) {
-      function tuple(value, _scope = "") {
-        const cardinality = typeFuncs.length;
-        if (isEmpty(value))
-          return typeFuncs.map((fn) => fn(value));
-        if (Array.isArray(value) && value.length === cardinality) {
-          const tupleValue = [];
-          for (let i = 0; i < cardinality; i += 1) {
-            tupleValue.push(typeFuncs[i](value[i], _scope));
-          }
-          return tupleValue;
-        }
-        throw validatorError(tuple, value, _scope);
-      }
-      tuple.type = () => `[${typeFuncs.map((fn) => getType2(fn)).join(", ")}]`;
-      return tuple;
-    }
-    var tupleOf = tupleOf_;
-
-    function unionOf_(...typeFuncs) {
-      function union(value, _scope = "") {
-        for (const typeFn of typeFuncs) {
-          try {
-            return typeFn(value, _scope);
-          } catch (_) { }
-        }
-        throw validatorError(union, value, _scope);
-      }
-      union.type = () => `(${typeFuncs.map((fn) => getType2(fn)).join(" | ")})`;
-      return union;
-    }
-    var unionOf = unionOf_;
-
-    // frontend/model/contracts/shared/constants.js
-    var INVITE_INITIAL_CREATOR = "invite-initial-creator";
-    var INVITE_STATUS = {
-      REVOKED: "revoked",
-      VALID: "valid",
-      USED: "used"
-    };
-    var PROFILE_STATUS = {
-      ACTIVE: "active",
-      PENDING: "pending",
-      REMOVED: "removed"
-    };
-    var PROPOSAL_RESULT = "proposal-result";
-    var PROPOSAL_INVITE_MEMBER = "invite-member";
-    var PROPOSAL_REMOVE_MEMBER = "remove-member";
-    var PROPOSAL_GROUP_SETTING_CHANGE = "group-setting-change";
-    var PROPOSAL_PROPOSAL_SETTING_CHANGE = "proposal-setting-change";
-    var PROPOSAL_GENERIC = "generic";
-    var PROPOSAL_ARCHIVED = "proposal-archived";
-    var MAX_ARCHIVED_PROPOSALS = 100;
-    var PAYMENTS_ARCHIVED = "payments-archived";
-    var MAX_ARCHIVED_PERIODS = 100;
-    var MAX_SAVED_PERIODS = 2;
-    var STATUS_OPEN = "open";
-    var STATUS_PASSED = "passed";
-    var STATUS_FAILED = "failed";
-    var STATUS_CANCELLED = "cancelled";
-    var CHATROOM_TYPES = {
-      INDIVIDUAL: "individual",
-      GROUP: "group"
-    };
-    var CHATROOM_PRIVACY_LEVEL = {
-      GROUP: "chatroom-privacy-level-group",
-      PRIVATE: "chatroom-privacy-level-private",
-      PUBLIC: "chatroom-privacy-level-public"
-    };
-    var MESSAGE_TYPES = {
-      POLL: "message-poll",
-      TEXT: "message-text",
-      INTERACTIVE: "message-interactive",
-      NOTIFICATION: "message-notification"
-    };
-    var INVITE_EXPIRES_IN_DAYS = {
-      ON_BOARDING: 30,
-      PROPOSAL: 7
-    };
-    var MESSAGE_NOTIFICATIONS = {
-      ADD_MEMBER: "add-member",
-      JOIN_MEMBER: "join-member",
-      LEAVE_MEMBER: "leave-member",
-      KICK_MEMBER: "kick-member",
-      UPDATE_DESCRIPTION: "update-description",
-      UPDATE_NAME: "update-name",
-      DELETE_CHANNEL: "delete-channel",
-      VOTE: "vote"
-    };
-    var PROPOSAL_VARIANTS = {
-      CREATED: "proposal-created",
-      EXPIRING: "proposal-expiring",
-      ACCEPTED: "proposal-accepted",
-      REJECTED: "proposal-rejected",
-      EXPIRED: "proposal-expired"
-    };
-    var MAIL_TYPE_MESSAGE = "message";
-    var MAIL_TYPE_FRIEND_REQ = "friend-request";
-    // frontend/model/contracts/shared/payments/index.js
-    var PAYMENT_PENDING = "pending";
-    var PAYMENT_CANCELLED = "cancelled";
-    var PAYMENT_ERROR = "error";
-    var PAYMENT_NOT_RECEIVED = "not-received";
-    var PAYMENT_COMPLETED = "completed";
-    var paymentStatusType = unionOf(...[PAYMENT_PENDING, PAYMENT_CANCELLED, PAYMENT_ERROR, PAYMENT_NOT_RECEIVED, PAYMENT_COMPLETED].map((k) => literalOf(k)));
-    var PAYMENT_TYPE_MANUAL = "manual";
-    var PAYMENT_TYPE_BITCOIN = "bitcoin";
-    var PAYMENT_TYPE_PAYPAL = "paypal";
-    var paymentType = unionOf(...[PAYMENT_TYPE_MANUAL, PAYMENT_TYPE_BITCOIN, PAYMENT_TYPE_PAYPAL].map((k) => literalOf(k)));
-
-    // frontend/model/contracts/shared/functions.js
-    function paymentHashesFromPaymentPeriod(periodPayments) {
-      let hashes = [];
-      if (periodPayments) {
-        const {
-          paymentsFrom
-        } = periodPayments;
-        for (const fromUser in paymentsFrom) {
-          for (const toUser in paymentsFrom[fromUser]) {
-            hashes = hashes.concat(paymentsFrom[fromUser][toUser]);
-          }
-        }
-      }
-      return hashes;
-    }
-
-    function createPaymentInfo(paymentHash, payment) {
-      return {
-        from: payment.meta.username,
-        to: payment.data.toUser,
-        hash: paymentHash,
-        amount: payment.data.amount,
-        isLate: !!payment.data.isLate,
-        when: payment.data.completedDate
-      };
-    }
 
     // frontend/model/contracts/shared/distribution/mincome-proportional.js
     function mincomeProportional(haveNeeds) {
@@ -475,69 +237,9 @@
     // frontend/model/contracts/shared/currencies.js
     var DECIMALS_MAX = 8;
 
-    function commaToDots(value) {
-      return typeof value === "string" ? value.replace(/,/, ".") : value.toString();
-    }
-
-    function isNumeric(nr) {
-      return !isNaN(nr - parseFloat(nr));
-    }
-
-    function isInDecimalsLimit(nr, decimalsMax) {
-      const decimals = nr.split(".")[1];
-      return !decimals || decimals.length <= decimalsMax;
-    }
-
-    function validateMincome(value, decimalsMax) {
-      const nr = commaToDots(value);
-      return isNumeric(nr) && isInDecimalsLimit(nr, decimalsMax);
-    }
-
-    function decimalsOrInt(num, decimalsMax) {
-      return num.toFixed(decimalsMax).replace(/\.0+$/, "");
-    }
-
     function saferFloat(value) {
       return parseFloat(value.toFixed(DECIMALS_MAX));
     }
-
-    function makeCurrency(options) {
-      const {
-        symbol,
-        symbolWithCode,
-        decimalsMax,
-        formatCurrency
-      } = options;
-      return {
-        symbol,
-        symbolWithCode,
-        decimalsMax,
-        displayWithCurrency: (n) => formatCurrency(decimalsOrInt(n, decimalsMax)),
-        displayWithoutCurrency: (n) => decimalsOrInt(n, decimalsMax),
-        validate: (n) => validateMincome(n, decimalsMax)
-      };
-    }
-    var currencies = {
-      USD: makeCurrency({
-        symbol: "$",
-        symbolWithCode: "$ USD",
-        decimalsMax: 2,
-        formatCurrency: (amount) => "$" + amount
-      }),
-      EUR: makeCurrency({
-        symbol: "\u20AC",
-        symbolWithCode: "\u20AC EUR",
-        decimalsMax: 2,
-        formatCurrency: (amount) => "\u20AC" + amount
-      }),
-      BTC: makeCurrency({
-        symbol: "\u0243",
-        symbolWithCode: "\u0243 BTC",
-        decimalsMax: DECIMALS_MAX,
-        formatCurrency: (amount) => amount + "\u0243"
-      })
-    };
-    var currencies_default = currencies;
 
     // frontend/model/contracts/shared/distribution/distribution.js
     var tinyNum = 1 / Math.pow(10, DECIMALS_MAX);
@@ -604,6 +306,7 @@
       return addDistributions(paymentsA, paymentsB);
     }
   </script>
+
   <script type="text/javascript">
     function getFormat() {
       function File() { }
@@ -734,6 +437,7 @@
     }
     const Format = getFormat()
   </script>
+
   <script type="text/javascript">
     var default_fragment_shader =
       `
@@ -770,18 +474,6 @@
     const OpenGLStageTypes = Format.OpenGLStage.Type;
 
     var is_safari = (navigator.userAgent.indexOf("iPhone") > -1 || navigator.userAgent.indexOf("iPad") > -1 || navigator.userAgent.indexOf("Safari") > -1) && navigator.userAgent.indexOf("Chrome") == -1;
-
-    window.requestAnimFrame = (function () {
-      return window.requestAnimationFrame ||
-        window.webkitRequestAnimationFrame ||
-        window.mozRequestAnimationFrame ||
-        window.oRequestAnimationFrame ||
-        window.msRequestAnimationFrame ||
-        function ( /* function FrameRequestCallback */ callback, /* DOMElement Element */ element) {
-          window.setTimeout(callback, 1000 / 60);
-        };
-    })();
-
     var api_names = ["webgl", "experimental-webgl", "webkit-3d", "moz-webgl"];
 
     var OpenGLPipeline = function (pipleline_proto) { // "Constructor."
@@ -1598,10 +1290,13 @@
           pipeline = new OpenGLPipeline(algorithm.pipeline);
       }
 
-      if (pipeline)
+      if (pipeline) {
+        // This is where window.requestAnimationFrame() is called, which infinitely repaints the page UI.
         pipeline.renderLoop();
+      }
     }
   </script>
+
   <script type="text/javascript">
     let body = document.getElementById("gis_body")
     String.prototype.hashCode = function () {
@@ -1856,6 +1551,24 @@ void main(void) {
       receivers = []
       event_list = []
       user_counter = 1;
+
+      pledger_clicked = null;
+      payment_clicked = null;
+      receiver_clicked = null;
+
+      const canvasEl = document.getElementById('gis_canvas_div')
+      const optionsEl = document.getElementById('gis_options_div')
+
+      if (canvasEl) {
+        // clear the inline styles on the canvas container element
+        canvasEl.style.minHeight = null
+        canvasEl.style.maxHeight = null
+      }
+
+      if (optionsEl) {
+        optionsEl.style.display = 'none'
+        optionsEl.innerHTML = ''
+      }
     }
 
     var mouse_page_position = [0, 0]
@@ -1871,7 +1584,6 @@ void main(void) {
     var pledger_clicked = null;
     var payment_clicked = null;
     var receiver_clicked = null;
-    var mouse_busy = false;
 
     function vectors_are_colinear(vector_a, vector_b) {
       return Math.abs(vector_a[0] * vector_b[1] -
@@ -1959,7 +1671,8 @@ void main(void) {
       receivers = []
       distribution_events = []
       var thread_safe_events = JSON.parse(JSON.stringify(event_list))
-      event_parse_loop: for (var j = 0; j < thread_safe_events.length; j++) {
+
+      for (var j = 0; j < thread_safe_events.length; j++) {
         var event = thread_safe_events[j];
 
         if (event.type == EVENT_TYPES.JOIN) {
@@ -2028,14 +1741,33 @@ void main(void) {
         }
       }
 
-      if (distribution_locked) {
-        document.getElementById("gis_lock_message").style.visibility = 'visible'
-      } else {
-        document.getElementById("gis_lock_message").style.visibility = 'hidden'
+      const lockMsgEl = document.getElementById('gis_lock_message')
+      const loadMsgEl = document.getElementById("load_message")
+
+      // Reveal or hide distribution-locked message.
+      if (lockMsgEl) {
+        lockMsgEl.style.visibility = distribution_locked ? 'visible' : 'hidden'
       }
 
-      if(pledgers.length + receivers.length > 0) document.getElementById("load_message").style.display = 'none';
-      else document.getElementById("load_message").style.display = 'block'
+      // Reveal or hide the load-message content.
+      if (loadMsgEl) {
+        loadMsgEl.style.display = pledgers.length + receivers.length > 0 ? 'none' : 'block'
+      }
+
+      // determine to increse the canvas height depending on the numbers of current pledgers / receivers.
+      const largeMemberCount = Math.max(pledgers.length, receivers.length)
+      const memberCountThreshold = window.matchMedia('(max-height: 900px)').matches ? 7 : 6
+      const extraHeightUnit = window.matchMedia('(max-height: 900px)').matches ? 150 : 70
+      const needsTallerCanvas = largeMemberCount > memberCountThreshold
+
+      if (needsTallerCanvas) {
+        const canvasEl = document.getElementById("gis_canvas_div")
+        const extraNumber = largeMemberCount - memberCountThreshold
+        const containerHeight = document.querySelector('#gis_body')?.getBoundingClientRect().height || 0
+
+        canvasEl.style.minHeight = `${containerHeight + extraHeightUnit * extraNumber}px`
+        canvasEl.style.maxHeight = 'unset'
+      }
     }
 
     function round_money(amount, digits = 2) {
@@ -2104,20 +1836,26 @@ void main(void) {
           [0, (current_pledge + pledger.last_income) / max_transferable, 1. / 3., pledger.last_income / max_transferable]
         ]
 
-        label_html.push("<div class='gis_user_wrapper'><div class='gis_user_name'>" + pledger.name + " Pledged</div>" + "Pledged $" + pledger.last_income + "</div>");
-        label_positions.push([avg_x, current_pledge / max_transferable + avg_y, 1. / 3., (pledger.last_income) / max_transferable])
+        label_html.push("<div class='gis_user_wrapper'><div class='gis_user_name'>" + pledger.name + "</div>" + "Pledged $" + pledger.last_income + "</div>");
+        label_positions.push([
+          avg_x, // left-top x
+          current_pledge / max_transferable + avg_y, // left-top y
+          1. / 3., // width
+          (pledger.last_income) / max_transferable // height
+        ])
 
         if (point_in_triangle(mouse_canvas_position, [trapezoid[0], trapezoid[1], trapezoid[2]]) ||
           point_in_triangle(mouse_canvas_position, [trapezoid[0], trapezoid[3], trapezoid[2]])) {
           mouse_under = true;
           pledger_clicked = function (pledger) {
             return function () {
+              console.log('!@# is it called - aaaaa')
               var change_pledge = `
               <label style="display:inline-block;">Amount:</label>
             <input id="pledge_amount" type="number" value="` + pledger.last_income + `" step="1" style="display:inline-block; width:64px">`
 
               show_option("<label class='gis_options_title'>" + pledger.name + "</label>" +
-                "<br><button class='gis_leave_button' onclick=\"user_leave_event(\'" + pledger.name + "\')\">Make Leave</button>");
+                "<br><button class='gis_leave_button' onclick=\"user_leave_event(\'" + pledger.name + "\')\">Leave</button>");
             }
           }(pledger)
         }
@@ -2145,8 +1883,13 @@ void main(void) {
           [2. / 3., (current_receive + receiver.last_income) / max_transferable, 1. / 3., receiver.last_income / max_transferable],
           [1, (current_receive + receiver.last_income) / max_transferable, 1. / 3., receiver.last_income / max_transferable]
         ]
-        label_html.push("<div class='gis_user_wrapper'><div class='gis_user_name'>" + receiver.name + " Receives</div>" + "Receives $" + receiver.last_income + "</div>");
-        label_positions.push([avg_x, current_receive / max_transferable + avg_y, 1. / 3., (receiver.last_income) / max_transferable])
+        label_html.push("<div class='gis_user_wrapper'><div class='gis_user_name'>" + receiver.name + "</div>" + "Receives $" + receiver.last_income + "</div>");
+        label_positions.push([
+          avg_x,
+          current_receive / max_transferable + avg_y,
+          1. / 3.,
+          (receiver.last_income) / max_transferable
+        ])
 
         if (point_in_triangle(mouse_canvas_position, [trapezoid[0], trapezoid[1], trapezoid[2]]) ||
           point_in_triangle(mouse_canvas_position, [trapezoid[0], trapezoid[3], trapezoid[2]])) {
@@ -2158,7 +1901,7 @@ void main(void) {
             <input id="receive_amount" type="number" value="` + receiver.last_income + `" step="1" style="display:inline-block; width:64px">`
 
               show_option("<label class='gis_options_title'>" + receiver.name + "</label>" +
-                "<br><button class='gis_leave_button' onclick=\"user_leave_event(\'" + receiver.name + "\')\">Make Leave</button>");
+                "<br><button class='gis_leave_button' onclick=\"user_leave_event(\'" + receiver.name + "\')\">Leave</button>");
             }
           }(receiver)
         }
@@ -2220,7 +1963,7 @@ void main(void) {
           var make_payment = `<div class="gis_payment_wrapper"> <span class="gis_currency_input">$
 									<input id="payment_amount` + i + `" type="number" value="` + payment.amount + `" max="` + payment.amount + `"step="1" class="gis_payment_input"></span>`
           payment_message += (payment_message ? "<br>" : "") + "<label class='gis_options_title'>Send Payment</label><br>" + make_payment +
-            "<button class='gis_payment_button' onclick=\"document.getElementById('gis_options_div').style.display='hidden'; hide_option(); user_pay_event(\'" + payment.from + "\', \'" + payment.to + "\', parseFloat(document.getElementById('payment_amount" + i + "').value))\">Send Payment</button></div>"
+            "<button class='gis_payment_button' onclick=\"document.getElementById('gis_options_div').style.display='hidden'; hide_option(); user_pay_event(\'" + payment.from + "\', \'" + payment.to + "\', parseFloat(document.getElementById('payment_amount" + i + "').value))\">Send</button></div>"
 
           payment_clicked = function () {
             show_option(payment_message);
@@ -2253,27 +1996,39 @@ void main(void) {
 
       reload_algorithm()
 
-      var canvas = pipeline.contexts[pipeline.contexts.length - 1].canvas;
+      var canvas_div = document.getElementById("gis_canvas_div");
+      var label_div = document.getElementById("gis_label_div");
+      var options_div = document.getElementById("gis_options_div");
 
+      var canvas = pipeline.contexts[pipeline.contexts.length - 1].canvas;
       canvas.style.position = 'relative';
       canvas.style.width = '100%';
       canvas.style.height = '100%';
-      var canvas_div = document.getElementById("gis_canvas_div");
-      var label_div = document.getElementById("gis_label_div")
+
       canvas_div.append(canvas);
 
       function res() {
         pipeline.contexts[pipeline.contexts.length - 1].resizeCanvas()
+
+        const optionsEl = document.getElementById('gis_options_div')
+        if (optionsEl) {
+          optionsEl.style.display = 'none'
+          optionsEl.innerHTML = ''
+        }
       }
       window.addEventListener('resize', res);
 
       function onmousemove(e) {
         mouse_page_position = [e.pageX, e.pageY]
-        mouse_canvas_position = [(e.pageX - canvas_div.offsetLeft) / canvas_div.offsetWidth, 1. - (e.pageY - canvas_div.offsetTop) / canvas_div.offsetHeight]
+        mouse_canvas_position = [
+          (e.pageX - canvas_div.offsetLeft) / canvas_div.offsetWidth,
+          1. - (e.pageY - canvas_div.offsetTop) / canvas_div.offsetHeight
+        ]
       };
       canvas_div.onmousemove = onmousemove
       canvas_div.onmouseup = function (e) {
-        if (mouse_busy) return;
+        const optionBoxClicked = Boolean(e.target.closest('.options_div'))
+        if (optionBoxClicked) return;
 
         if (pledger_clicked) pledger_clicked()
         else if (payment_clicked) payment_clicked()
@@ -2282,15 +2037,6 @@ void main(void) {
           hide_option()
         }
       };
-      var options_div = document.getElementById("gis_options_div")
-      var label_div = document.getElementById("gis_label_div")
-
-      options_div.onmouseenter = function (e) {
-        mouse_busy = true;
-      }
-      options_div.onmouseleave = function (e) {
-        mouse_busy = false;
-      }
 
       window.show_option = (html) => {
         options_div.style.display = "block"
@@ -2321,7 +2067,7 @@ void main(void) {
             g = new Number(g).toFixed(3)
             b = new Number(b).toFixed(3)
 
-            var rgba = 'rgba(' + r + ', ' + g + ', ' + b + ', 255.0)'
+            var boxShadowColor = 'rgba(' + r + ', ' + g + ', ' + b + ', 255.0)'
 
             var scalar = .25;
             if (is_receiver) {
@@ -2331,26 +2077,36 @@ void main(void) {
               x += w * scalar / 2;
               w -= w * scalar;
             }
-            const faces = ["profiles/Face 6.png",
+            const faceSrcs = [
+              "profiles/Face 6.png",
               "profiles/Face 7.png",
               "profiles/Face 8.png",
               "profiles/Face 9.png",
-              "profiles/Face 10.png"]
+              "profiles/Face 10.png"
+            ]
+            const getFaceSrc = hash => faceSrcs[Math.abs(hash) % faceSrcs.length]
+            const smallWidth = w < 180
 
-            return acc + '<div class="wealth_div ' + (is_receiver ? "receiver" : "pledger") + '_div" style="box-shadow: 4px 4px 0px ' + rgba +
-              '; transform:translate(-50%,-50%); position:absolute; text-align:center; left: ' + x + 'px; top: ' + y + 'px; ' +
-              ' width: ' + w + 'px; height: ' + h + 'px; color: #000 !important; background: #fff; border: 1px solid #D0DEEA;">' +
-              '<div style="align-items: center; display:flex; flex-direction: row;  height: 100%; overflow:hidden;">'+
-              '<img class="gis_profile_image" src="'+faces[Math.abs(hash)%faces.length]+'">'+'<div class="gis_label_div">' + label_html + '</div></div></div>'
-          }, "")
+            return acc + `
+              <div class='wealth_div ${smallWidth ? 'small-width' : ''}'
+                style='box-shadow: 4px 4px 0px ${boxShadowColor}; left: ${x}px; top: ${y}px; width: ${w}px; height: ${h}px;'>
+                <img class="wealth_div__img" src='${getFaceSrc(hash)}' />
+                <div class='wealth_div__label'>${label_html}</div>
+              </div>
+            `
+          }, '')
+
           html += total_html.reduce((acc, html, index) => {
             var x = Math.floor(total_positions[index][0] * canvas_div.offsetWidth)
             var y = Math.floor((1. - total_positions[index][1]) * canvas_div.offsetHeight)
-            return acc + '<div class="distribution_div" style="transform:translate(-50%,-50%); position:absolute; display:block; left: ' + x + 'px; top: ' + y + 'px; z-index:10;">' + html + '</div>'
+            return acc + '<div class="distribution_div" style="transform:translate(0%,-50%); position:absolute; display:block; left: ' + x + 'px; top: ' + y + 'px; z-index:10;">' + html + '</div>'
           }, "")
+
           label_div.style.display = "block"
-          if (html != window.last_label_html)
+          if (html != window.last_label_html) {
             label_div.innerHTML = html;
+          }
+
           window.last_label_html = html;
           label_div.onmousemove = onmousemove
         } else
@@ -2358,8 +2114,10 @@ void main(void) {
       }
 
       function onmousemove(e) {
-        mouse_page_position = [e.pageX, e.pageY]
-        mouse_canvas_position = [(e.pageX - canvas_div.offsetLeft) / canvas_div.offsetWidth, 1. - (e.pageY - canvas_div.offsetTop) / canvas_div.offsetHeight]
+        const contentScrollY = document.querySelector('#gis_body')?.scrollTop || 0
+
+        mouse_page_position = [e.pageX, contentScrollY + e.pageY]
+        mouse_canvas_position = [(e.pageX - canvas_div.offsetLeft) / canvas_div.offsetWidth, 1. - (contentScrollY + e.pageY - canvas_div.offsetTop) / canvas_div.offsetHeight]
       };
       canvas_div.onmousemove = onmousemove
       window.hide_option()

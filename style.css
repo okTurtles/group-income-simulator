@@ -1,185 +1,268 @@
- /* Fonts */
- @font-face {
-   src: url(./fonts/Poppins/Poppins-Medium.ttf);
-   font-family: "Poppins";
-   font-weight: 500;
- }
+/*
+Reference NOTE: Some style specs used in groupincome.org V2.0 (https://github.com/okTurtles/groupincome.org)
 
- @font-face {
-   src: url(./fonts/Poppins/Poppins-SemiBold.ttf);
-   font-family: "Poppins";
-   font-weight: 600;
- }
+1] Media queries
+$tablet: 769px;
+$desktop: 1200px;
 
- @font-face {
-   src: url(./fonts/Poppins/Poppins-Bold.ttf);
-   font-family: "Poppins";
-   font-weight: 700;
- }
+*/
 
- @font-face {
-   src: url(./fonts/Poppins/Poppins-Regular.ttf);
-   font-family: "Poppins";
-   font-weight: 400;
- }
+:root {
+  --primary_0: #0288d1;
+  --primary_0_1: #02679e;
+  --primary_1: #b3dbf2;
+  --primary_2: #e5f3fA;
+  --success_0: #40854f;
+  --success_0_1: #2f633b;
+  --success_1: #bfd4c3;
+  --success_2: #e4f1e7;
+  --warning_0: #ff6f00;
+  --warning_0_1: #cc5900;
+  --warning_0_text: #73492a;
+  --warning_0_2: ;
+  --warning_1: #ffcea8;
+  --warning_2: #ffeee0;
+  --danger_0: #c62828;
+  --danger_0_1: #9c1f1f;
+  --danger_1: #ebb3b3;
+  --danger_2: #faebeb;
+  --text_0: #363636;
+  --text_1: #707070;
+  --general_0: #dbdbdb;
+  --general_1: #ededed;
+  --general_1_opacity_6: rgba(237,237,237,0.6);
+  --general_2: #f5f5f5;
+  --background_0: #ffffff;
+  --background_0_opacity_0: rgba(255,255,255,0);
+  --text-size: 16px;
+  --orange: #F89202;
+  --blue: #5DC9F1;
+  --green: #A1D10E;
+  --footer-bg-color: #3B405C;
 
- @font-face {
-   src: url(./fonts/Lato/Lato-Bold.ttf);
-   font-family: "Lato";
-   font-weight: 700;
- }
+  /* z-indexes */
+  --zindex-tooltip: 10;
+}
 
- @font-face {
-   src: url(./fonts/Lato/Lato-Regular.ttf);
-   font-family: "Lato";
-   font-weight: 400;
- }
+/* Fonts */
+@font-face {
+  src: url(./fonts/Poppins/Poppins-Regular.ttf);
+  font-family: "Poppins";
+  font-weight: 400;
+}
 
- /* Simulator */
- .gis_user_wrapper {
-   font-family: 'Poppins';
-   font-style: normal;
-   font-weight: 600;
-   font-size: 16px;
-   text-align: left;
-   padding: 10px;
- }
+@font-face {
+  src: url(./fonts/Poppins/Poppins-Medium.ttf);
+  font-family: "Poppins";
+  font-weight: 500;
+}
 
- .gis_user_name {
-   font-weight: 500;
-   font-size: 14px;
-   color: rgba(0, 0, 0, 0.5);
-   padding-bottom: 8px;
- }
+@font-face {
+  src: url(./fonts/Poppins/Poppins-SemiBold.ttf);
+  font-family: "Poppins";
+  font-weight: 600;
+}
 
- /* Reset */
- body,
- html {
-   font-family: 'Poppins';
-   font-weight: 500;
-   height: 100%;
-   width: 100%;
-   margin: 0px;
-   text-align: center;
- }
+@font-face {
+  src: url(./fonts/Poppins/Poppins-Bold.ttf);
+  font-family: "Poppins";
+  font-weight: 700;
+}
 
- #gis_body {
-    overflow: hidden;
+/* Buttons */
+
+button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+  height: auto;
+  min-height: 44px;
+  border-radius: 44px;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+  border-color: rgba(0, 0, 0, 0);
+  border-width: 1px;
+  border-style: solid;
+  color: var(--background_0);
+  background-color: var(--primary_0);
+  transition: box-shadow 150ms ease-in;
+  white-space: nowrap;
+  font-family: "Poppins";
+  outline: none;
+}
+
+button:hover,
+button:focus {
+  background-color: var(--primary_0_1);
+}
+
+button:focus {
+  box-shadow: 0 0 0 2px var(--primary_1);
+}
+
+/* Reset */
+
+body,
+html {
+  font-family: 'Poppins';
+  font-weight: 500;
+  height: 100%;
+  width: 100%;
+  margin: 0px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+#gis_body {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* Layout */
+.gis_layout {
+  display: grid;
+  grid-template-rows: 100px 1fr auto;
+  height: 100%;
+  background-color: var(--background_0);
+}
+
+.gis_wrapper {
+  width: 1092px;
+  max-width: calc(100vw - 32px);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gis_main {
+  overflow-x: hidden;
+  overflow-y: auto;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.gis_main.show_canvas .gis_instruction {
+  display: none;
+}
+
+.gis_main.show_canvas #gis_canvas_div {
+  display: block;
+}
+
+/* Header */
+
+.gis_header_wrapper {
+  position: relative;
+  margin: 0px auto;
+  height: 100px;
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 20px 20px 0;
+  box-sizing: border-box;
+}
+
+.gis_logo {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.gis_logo img {
+  display: block;
+  height: 42px;
+  width: auto;
+}
+
+button.gis_logo_button {
+  margin-top: 6px;
+}
+
+.gis_logo_label {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 300;
+  font-size: 12px;
+  line-height: 1;
+  top: 6px;
+  text-transform: uppercase;
+  color: var(--text_0);
+  vertical-align: middle;
+  user-select: none;
+  margin: -8px 0 0 0;
+}
+
+@media screen and (max-width: 769px) {
+  .gis_header_wrapper {
+    padding: 16px 16px 0;
+    height: 70px;
   }
 
- /* Layout */
- .gis_layout {
-   display: grid;
-   grid-template-rows: 100px 1fr auto;
-   height: 100%;
-   background: url(images/background.svg) no-repeat;
-   background-size: cover;
- }
+  .gis_logo_label {
+    margin-top: -6px;
+  }
 
- .gis_banners {
-   display: flex;
-   align-items: center;
-   flex-direction: column;
- }
+  .gis_logo img {
+    height: 32px;
+  }
 
- .gis_wrapper {
-   width: 1092px;
-   max-width: calc(100vw - 32px);
-   margin: 0 auto;
-   display: flex;
-   align-items: center;
-   justify-content: center;
- }
+  button.gis_logo_button {
+    min-height: 36px;
+    border-radius: 36px;
+    padding-left: 12px;
+    padding-right: 12px;
+    margin-top: 4px;
+    font-size: 14px;
+  }
+}
 
- .gis_main {
-   overflow: scroll;
- }
+/* Option-box UI (The menu pop-up that is displayed upon clicking on the group members) */
+.options_div {
+  background: var(--background_0);
+  border: 1px solid var(--text_0);
+  box-shadow: 2px 2px 0px rgba(62, 68, 98, 0.2);
+  border-radius: 4px;
+  padding: 8px;
+  position: absolute;
+  text-align: left;
+  z-index: var(--zindex-tooltip);
 
- /* Header */
- .gis_header_wrapper {
-   margin: 0px auto;
-   height: 100px;
-   display: flex;
-   align-items: center;
-   justify-content: space-between;
- }
+  &:empty {
+    padding: 0;
+    border: none;
+    pointer-events: none;
+  }
+}
 
- .gis_main.show_canvas .gis_instruction {
-   display: none;
- }
-
- .gis_main.show_canvas #gis_canvas_div {
-   display: block;
- }
-
- .gis_logo {
-   display: flex;
-   align-items: center;
- }
-
- .gis_logo_label {
-   font-family: 'Poppins';
-   font-style: normal;
-   font-weight: 500;
-   font-size: 16px;
-   top: 6px;
-   text-transform: uppercase;
-   margin-left: 8px;
-   color: #363636;
-   vertical-align: middle;
- }
-
- .gis_logo_button {
-   border: none;
-   background: #EFF2F6;
-   border-radius: 100px;
-   display: flex;
-   height: 44px;
-   align-items: center;
-   justify-content: center;
-   padding: 0 30px;
-   font-size: 14px;
-   font-weight: 700;
-   color: #3E4462;
-   cursor: pointer;
- }
-
- .gis_label_div {
-   width: fit-content;
-   position: relative;
- }
-
- .gis_profile_image {
-  max-height:64px;
-  margin: 8px;
- }
-
- #gis_options_div {
-   background: #FFFFFF;
-   border: 1px solid #3E4462;
-   box-shadow: 2px 2px 0px rgba(62, 68, 98, 0.2);
-   border-radius: 4px;
-   padding: 8px;
-   position: absolute;
-   text-align: left;
-   z-index: 10;
- }
-
- .gis_options_title {
-   font-family: 'Poppins';
-   font-style: normal;
-   font-weight: 600;
-   font-size: 14px;
-   line-height: 14px;
-   /* identical to box height, or 100% */
-
-   text-transform: uppercase;
-
-   color: #363636;
-
- }
+.gis_options_title {
+  font-size: 12px;
+  line-height: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-0);
+}
 
  /* Body */
+.distribution-locked-msg {
+  visibility: hidden;
+  height: 1em;
+  color: var(--orange);
+  padding: 12px 0;
+}
  .gis_instruction {
    max-width: 100%;
    width: 540px;
@@ -191,156 +274,267 @@
  /* Canvas */
  #gis_canvas_div {
    position: relative;
+   align-self: stretch;
    width: 100%;
-   height: 90%;
+   margin-bottom: 40px;
+   max-height: calc(100% - 40px);
    display: none;
  }
 
- #image-context {
-   z-index: 2 !important;
-   height: 100% !important;
- }
+#image-context {
+  z-index: 2 !important;
+  height: 100% !important;
+}
 
- .gis_input_wrapper {
-   background: #FFFFFF;
-   border: 1px solid #DBDBDB;
-   border-radius: 4px;
-   height: 48px;
-   display: flex;
-   align-items: center;
-   padding: 0 16px;
-   font-family: 'Lato';
-   max-width: calc(100vw - 4rem);
-   width: 306px;
-   justify-content: space-between;
- }
+/* Distribution member card UI */
+.wealth_div {
+  position:absolute;
+  text-align:center;
+  z-index: 10;
+  background-color: var(--background_0);
+  border: 1px solid var(--general_0);
+  transform:translate(-50%,-50%);
+  color: var(--text-0);
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  column-gap: 8px;
+  padding: 12px;
+}
 
- .gis_input_field {
-   display: flex;
- }
+.wealth_div__label {
+  position: relative;
+  flex-grow: 1;
+}
 
- .gis_input_label {
-   font-size: 14px;
-   margin-right: 16px;
-   line-height: 22px;
-   font-weight: 700;
- }
+.wealth_div__img {
+  display: block;
+  flex-shrink: 0;
+  height: 100%;
+  max-height: 64px;
+  width: auto;
+}
 
- .wealth_div {
-   z-index: 10;
-   background: #FFFFFF;
-   border: 1px solid #D0DEEA;
-   border-radius: 4px;
-   box-shadow: 4px 4px 0px;
-   overflow: hidden;
- }
-
- .distribution_div {
-   color: #fff;
-   background: #3E4462;
-   border: 1px solid #FFFFFF;
-   z-index: 10;
-   padding: 3px !important;
-   border-radius: 6px;
-   position: absolute;
-   text-align: left;
- }
-
- /* Inputs */
- .gis_amount {
-   border: none;
-   font-size: 16px;
-   width: 4rem;
- }
-
- /* Buttons */
- .gis_buttons {
-   display: flex;
-   flex-direction: row;
-   justify-content: center;
-   align-items: center;
-   height: 48px;
-   max-width: 340px;
-   text-align: center;
-   width: 100%;
-   background-color: #0288D1;
-   border: 1px solid #0288D1;
-   border-radius: 4px;
-   color: #fff;
-   font-family: 'Lato';
-   font-style: normal;
-   font-weight: 800;
-   font-size: 16px;
-   line-height: 20px;
-   cursor: pointer;
- }
-
- .gis_currency {
-   color: #707070;
-   width: 50px;
-   text-align: right;
- }
-
- /* Footer */
-
- .gis_footer {
-   background: #3B405C;
-   min-height: 50px;
-   padding: 8px;
-   box-sizing: border-box;
- }
-
- .gis_footer_wrapper {
-   display: flex;
-   align-items: center;
-   justify-content: space-around;
-   flex-wrap: wrap;
-   height: 100%;
-   gap: 16px;
- }
-
- .gis_payment_wrapper {
-   background: #FFFFFF;
-   border: 1px solid #D0DEEA;
-   border-radius: 4px;
- }
-
- .gis_payment_button,
- .gis_leave_button {
-   background: #0288D1;
-   border-radius: 0px 4px 4px 0px;
-   font-family: 'Poppins';
-   font-style: normal;
-   font-weight: 400;
-   font-size: 14px;
-   line-height: 21px;
-   letter-spacing: 0.1px;
-   color: #FFFFFF;
-   border: none;
- }
-
- .gis_payment_input,
- .gis_currency_input {
-   font-family: 'Lato';
-   font-style: normal;
-   font-weight: 400;
-   font-size: 12px;
-   line-height: 24px;
-   /* identical to box height, or 200% */
-
-   letter-spacing: -0.3px;
-
-   color: #363636;
- }
-
- .gis_currency_input input {
-   border: 0;
-   width: 48px;
- }
-
-
- @media (orientation: landscape) {
-  .gis_footer_wrapper > * {
-    max-width: 25%;
+@media screen and (max-width: 670px) {
+  .wealth_div__img {
+    display: none;
   }
+}
+
+.gis_user_wrapper {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+  font-size: 16px;
+  text-align: left;
+  line-height: 1.3;
+}
+
+@media screen and (max-width: 769px) {
+  .gis_user_wrapper {
+    font-size: 14px;
+  }
+}
+
+@media screen and (max-width: 441px) {
+  .gis_user_wrapper {
+    font-size: 12px;
+  }
+}
+
+.gis_user_name {
+  font-size: 0.825em;
+  opacity: 0.5;
+}
+
+/* no-img style of label UI */
+@media screen and (max-width: 580px) {
+  .wealth_div.small-width {
+    padding: 8px 6px;
+  }
+}
+
+
+/* distribution_div */
+
+.distribution_div {
+  color: var(--background_0);
+  background: var(--text_0);
+  z-index: 10;
+  padding: 4px !important;
+  border-radius: 6px;
+  position: absolute;
+  text-align: left;
+}
+
+/* Footer */
+
+.gis_footer {
+  position: relative;
+  width: 100%;
+  background-color: var(--footer-bg-color);
+  box-sizing: border-box;
+  min-height: 50px;
+  padding: 12px 16px;
+  box-sizing: border-box;
+  border-top: 1px solid var(--footer-bg-color);
+}
+
+.gis_footer_wrapper {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  flex-wrap: wrap;
+  height: 100%;
+  gap: 10px;
+}
+
+.footer-input-wrapper {
+  background: var(--background_0);
+  border: 1px solid var(--general_1);
+  border-radius: 4px;
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  justify-content: space-between;
+  font-size: 16px;
+}
+
+.amount-label {
+  position: relative;
+  font-size: 12px;
+  margin-right: 10px;
+  font-weight: 700;
+  transform: translateY(2px);
+  flex-shrink: 0;
+}
+
+.amount-input {
+  padding: 6px 8px;
+  width: auto;
+  max-width: 120px;
+  font-size: inherit;
+  outline: none;
+  border: 1px solid var(--general_0);
+  border-radius: 4px;
+  text-align: left;
+  transition: border-color 200ms;
+}
+
+.amount-input:focus {
+  border-color: var(--text_1);
+}
+
+.gis_currency {
+  color: #707070;
+  width: 50px;
+  text-align: right;
+}
+
+
+.gis_footer button.footer-btn {
+  border-radius: 4px;
+}
+
+/* Footer in small screen */
+@media screen and (max-width: 540px) {
+  .gis_footer {
+    padding: 10px 12px;
+  }
+
+  .gis_footer_wrapper {
+    gap: 0;
+    overflow: hidden;
+    border-radius: 4px;
+    width: max-content;
+    max-width: unset;
+  }
+
+  .footer-input-wrapper {
+    min-height: 32px;
+    padding: 4px 8px;
+    border-radius: 0;
+  }
+
+  .footer-input-wrapper .amount-label {
+    font-size: 10px;
+    margin-right: 4px;
+  }
+
+  .footer-input-wrapper .amount-input {
+    font-size: 12px;
+    padding: 4px 6px;
+    width: 68px;
+  }
+
+  .gis_footer button.footer-btn {
+    border-radius: 0px;
+    min-height: 32px;
+    padding-left: 8px;
+    padding-right: 8px;
+    font-size: 11px;
+    min-width: 100px;
+    background-color: var(--primary_0);
+    border-color: var(--primary_0);
+    color: var(--background_0);
+  }
+}
+
+@media screen and (max-width: 380px) {
+  .gis_footer {
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+
+  .gis_footer button.footer-btn {
+    font-size: 10px;
+    padding-left: 6px;
+    padding-right: 6px;
+    min-width: unset;
+  }
+}
+
+.gis_payment_wrapper {
+  display: flex;
+  gap: 6px;
+  background: var(--background_0);
+}
+
+.gis_payment_button,
+.gis_leave_button {
+  min-height: unset;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+}
+
+.gis_payment_input,
+.gis_currency_input {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 24px;
+  /* identical to box height, or 200% */
+
+  letter-spacing: -0.3px;
+
+  color: var(--text_0);
+}
+
+.gis_payment_wrapper .gis_currency_input {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  border-radius: 4px;
+  border: 1px solid var(--general_0);
+}
+
+.gis_currency_input input {
+  border: 0;
+  width: 64px;
 }
