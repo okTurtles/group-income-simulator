@@ -2049,12 +2049,11 @@ void main(void) {
       }
       window.show_labels = () => {
         if (label_html) {
-          const LABEL_MAX_HEIGHT = window.innerWidth > 760 ? 86 : 70
           var html = label_html.reduce((acc, label_html, index) => {
             var x = Math.floor(label_positions[index][0] * canvas_div.offsetWidth)
             var y = Math.floor((1. - label_positions[index][1]) * canvas_div.offsetHeight)
             var w = Math.floor(label_positions[index][2] * canvas_div.offsetWidth)
-            var h = Math.min(Math.floor((label_positions[index][3]) * canvas_div.offsetHeight), LABEL_MAX_HEIGHT)
+            var h = Math.floor((label_positions[index][3]) * canvas_div.offsetHeight)
 
             var is_receiver = index >= pledgers.length
             var user = is_receiver ? receivers[index - pledgers.length] : pledgers[index];

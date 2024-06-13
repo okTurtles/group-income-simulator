@@ -412,7 +412,7 @@ button.gis_logo_button {
 .amount-input {
   padding: 6px 8px;
   width: auto;
-  max-width: 100px;
+  max-width: 120px;
   font-size: inherit;
   outline: none;
   border: 1px solid var(--general_0);
