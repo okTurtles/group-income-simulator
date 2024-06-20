@@ -1849,7 +1849,6 @@ void main(void) {
           mouse_under = true;
           pledger_clicked = function (pledger) {
             return function () {
-              console.log('!@# is it called - aaaaa')
               var change_pledge = `
               <label style="display:inline-block;">Amount:</label>
             <input id="pledge_amount" type="number" value="` + pledger.last_income + `" step="1" style="display:inline-block; width:64px">`
@@ -2018,14 +2017,17 @@ void main(void) {
       }
       window.addEventListener('resize', res);
 
-      function onmousemove(e) {
-        mouse_page_position = [e.pageX, e.pageY]
+      function capturePointerPosition(e) {
+        let event = e.type === 'touchstart' ? e.touches[0] : e
+
+        mouse_page_position = [event.pageX, event.pageY]
         mouse_canvas_position = [
-          (e.pageX - canvas_div.offsetLeft) / canvas_div.offsetWidth,
-          1. - (e.pageY - canvas_div.offsetTop) / canvas_div.offsetHeight
+          (event.pageX - canvas_div.offsetLeft) / canvas_div.offsetWidth,
+          1. - (event.pageY - canvas_div.offsetTop) / canvas_div.offsetHeight
         ]
       };
-      canvas_div.onmousemove = onmousemove
+      canvas_div.onmousemove = capturePointerPosition
+      canvas_div.ontouchstart = capturePointerPosition
       canvas_div.onmouseup = function (e) {
         const optionBoxClicked = Boolean(e.target.closest('.options_div'))
         if (optionBoxClicked) return;
