@@ -254,6 +254,7 @@ button.gis_logo_button {
   font-weight: 700;
   text-transform: uppercase;
   color: var(--text-0);
+  user-select: none;
 }
 
  /* Body */
@@ -329,6 +330,7 @@ button.gis_logo_button {
   font-size: 16px;
   text-align: left;
   line-height: 1.3;
+  user-select: none;
 }
 
 @media screen and (max-width: 769px) {
@@ -366,6 +368,7 @@ button.gis_logo_button {
   border-radius: 6px;
   position: absolute;
   text-align: left;
+  pointer-events: none;
 }
 
 /* Footer */
