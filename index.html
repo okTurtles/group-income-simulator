@@ -2010,7 +2010,9 @@ void main(void) {
         pipeline.contexts[pipeline.contexts.length - 1].resizeCanvas()
 
         const optionsEl = document.getElementById('gis_options_div')
-        if (optionsEl) {
+        const isPaymentInputActive = document.activeElement && document.activeElement.matches('input.gis_payment_input')
+
+        if (optionsEl && !isPaymentInputActive) {
           optionsEl.style.display = 'none'
           optionsEl.innerHTML = ''
         }
