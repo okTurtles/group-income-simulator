@@ -2010,7 +2010,11 @@ void main(void) {
         pipeline.contexts[pipeline.contexts.length - 1].resizeCanvas()
 
         const optionsEl = document.getElementById('gis_options_div')
-        if (optionsEl) {
+        const isPaymentInputActive = document.activeElement && document.activeElement.matches('input.gis_payment_input')
+
+        if (optionsEl &&
+          !isPaymentInputActive // This is a bug-fix for the issue #6 (https://github.com/okTurtles/group-income-simulator/issues/6)
+        ) {
           optionsEl.style.display = 'none'
           optionsEl.innerHTML = ''
         }
